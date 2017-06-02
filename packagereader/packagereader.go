@@ -14,38 +14,55 @@ import (
 	"strings"
 )
 
-// PackageReader contains the packages that are read from the file.
-type PackageReader struct {
-	packages map[string]*LinuxPackage
+// PackageInfoReader contains the packages that are read from the file.
+type PackageInfoReader struct {
+	packages map[string]*PackageInfo
 }
 
-// Constants for recognizing different prefixes in the file
-const packagePrefix = "Package:"
+// Prefix used in control file to recognize package name
+const namePrefix = "Package:"
+
+// Prefix used in control file to recognize description block
 const descriptionPrefix = "Description:"
+
+// Prefix used in control file to recognize package maintainer
+const maintainerPrefix = "Maintainer:"
+
+// Prefix used in control file to recognize package architecture
+const architecturePrefix = "Architecture:"
+
+// Prefix used in control file to recognize package version
+const versionPrefix = "Version:"
+
+// Prefix used in control file to recognize package dependencies
 const dependsPrefix = "Depends:"
+
+// Prefix used in control file to recognize indented line (continuation of description)
 const whitespace = " "
+
+// Prefix used in control file to recognize a blank line
 const blankLine = " ."
+
+// String constant for line break
 const lineBreak = "\n"
 
-// NewPackageReader constructs a new package reader object.
+// NewPackageInfoReader constructs a new package reader object.
 // Recommended instead of creating directly the object, as this function initializes underlying
 // data structures correctly.
-func NewPackageReader() *PackageReader {
-	p := new(PackageReader)
-	p.packages = make(map[string]*LinuxPackage)
+func NewPackageInfoReader() *PackageInfoReader {
+	p := new(PackageInfoReader)
+	p.packages = make(map[string]*PackageInfo)
 	return p
 }
 
-// Packages returns a map of the packages. Key to the map
-// is the package name as a string, value is a pointer to the LinuxPackage struct
-// describing the package contents.
-func (pr *PackageReader) Packages() map[string]*LinuxPackage {
+// Packages returns a map of the packages.
+func (pr *PackageInfoReader) Packages() map[string]*PackageInfo {
 	return pr.packages
 }
 
 // ParseFile reads and parses the contents of a given file.
 // Returns an error if parsing was not successful. Common errors: wrong filename / missing file.
-func (pr *PackageReader) ParseFile(fileName string) error {
+func (pr *PackageInfoReader) ParseFile(fileName string) error {
 	err := pr.readFileContents(fileName, false)
 	if err != nil {
 		return err
@@ -69,7 +86,7 @@ func (pr *PackageReader) ParseFile(fileName string) error {
 //
 // Example: Package A depends on Package B or C. When reading through the information for package A,
 // we don't know which one of the alternate packages B or C really exist in the system.
-func (pr *PackageReader) readFileContents(fileName string, packagesAlreadyScanned bool) error {
+func (pr *PackageInfoReader) readFileContents(fileName string, packagesAlreadyScanned bool) error {
 	file, err := os.Open(fileName)
 	if err != nil {
 		log.Fatal(err)
@@ -82,24 +99,33 @@ func (pr *PackageReader) readFileContents(fileName string, packagesAlreadyScanne
 	var packageName string
 	var simpleDescription string
 	var readingDescription = false
+	var maintainer string
+	var architecture string
+	var version string
 	var dependencies []string
 	var packageDescriptionBuffer bytes.Buffer
 
 	for scanner.Scan() {
 		line := scanner.Text()
 		switch {
-		case strings.HasPrefix(line, packagePrefix):
-			packageName = strings.TrimSpace(line[len(packagePrefix):])
+		case strings.HasPrefix(line, namePrefix):
+			packageName = strings.TrimSpace(line[len(namePrefix):])
 			readingDescription = false
 		case strings.HasPrefix(line, descriptionPrefix):
 			simpleDescription = strings.TrimSpace(line[len(descriptionPrefix):])
 			readingDescription = true
 		case strings.HasPrefix(line, dependsPrefix):
 			dependencies = parseDependencies(strings.TrimSpace(line[len(dependsPrefix):]))
+		case strings.HasPrefix(line, maintainerPrefix):
+			maintainer = strings.TrimSpace(line[len(maintainerPrefix):])
+		case strings.HasPrefix(line, architecturePrefix):
+			architecture = strings.TrimSpace(line[len(architecturePrefix):])
+		case strings.HasPrefix(line, versionPrefix):
+			version = strings.TrimSpace(line[len(versionPrefix):])
 		case len(line) == 0:
 			readingDescription = false
 
-			p := NewLinuxPackage(packageName, simpleDescription, packageDescriptionBuffer.String())
+			p := NewPackageInfo(packageName, simpleDescription, packageDescriptionBuffer.String(), maintainer, architecture, version)
 			for _, dependency := range dependencies {
 				if packagesAlreadyScanned {
 					_, packageExists := pr.packages[dependency]
@@ -156,7 +182,7 @@ func parseDependencies(line string) []string {
 // Handles reverse dependencies for a given package and its dependencies.
 // Updates the reverse dependency information for the package names listed in dependencies
 // by adding packageName as a reverse dependency for each package in dependencies.
-func (pr *PackageReader) handleReverseDependencies(packageName string, dependencies []string) {
+func (pr *PackageInfoReader) handleReverseDependencies(packageName string, dependencies []string) {
 	for _, item := range dependencies {
 		elem, ok := pr.packages[item]
 		if ok {

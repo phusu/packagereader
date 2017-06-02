@@ -5,7 +5,7 @@ import (
 )
 
 func TestNewLinuxPackage(t *testing.T) {
-	p := NewLinuxPackage("name", "simpledescription", "extendeddescription")
+	p := NewPackageInfo("name", "simpledescription", "extendeddescription", "ubuntu", "amd64", "3.3-2")
 	if p.Name() != "name" {
 		t.Error("Expected name")
 	}
@@ -15,10 +15,19 @@ func TestNewLinuxPackage(t *testing.T) {
 	if p.ExtendedDescription()[0] != "extendeddescription" {
 		t.Error("Expected extendeddescription")
 	}
+	if p.Maintainer() != "ubuntu" {
+		t.Error("Expected ubuntu")
+	}
+	if p.Architecture() != "amd64" {
+		t.Error("Expected amd64")
+	}
+	if p.Version() != "3.3-2" {
+		t.Error("Expected 3.3-2")
+	}
 }
 
 func TestSetSimpleDescription(t *testing.T) {
-	p := NewLinuxPackage("name", "simpledescription", "extendeddescription")
+	p := NewPackageInfo("name", "simpledescription", "extendeddescription", "ubuntu", "amd64", "3.3-2")
 	if p.SimpleDescription() != "simpledescription" {
 		t.Error("Expected simpledescription")
 	}
@@ -28,7 +37,7 @@ func TestSetSimpleDescription(t *testing.T) {
 	}
 }
 func TestSetExtendedDescription(t *testing.T) {
-	p := NewLinuxPackage("name", "simpledescription", "extendeddescription")
+	p := NewPackageInfo("name", "simpledescription", "extendeddescription", "ubuntu", "amd64", "3.3-2")
 	if p.ExtendedDescription()[0] != "extendeddescription" {
 		t.Error("Expected extendeddescription")
 	}
@@ -39,7 +48,7 @@ func TestSetExtendedDescription(t *testing.T) {
 }
 
 func TestAddDependency(t *testing.T) {
-	p := NewLinuxPackage("name", "simpledescription", "extendeddescription")
+	p := NewPackageInfo("name", "simpledescription", "extendeddescription", "ubuntu", "amd64", "3.3-2")
 	p.AddDependency("dependency", false)
 	for key, value := range p.Dependencies() {
 		if key == "dependency" && !value {
@@ -50,7 +59,7 @@ func TestAddDependency(t *testing.T) {
 }
 
 func TestAddReverseDependency(t *testing.T) {
-	p := NewLinuxPackage("name", "simpledescription", "extendeddescription")
+	p := NewPackageInfo("name", "simpledescription", "extendeddescription", "ubuntu", "amd64", "3.3-2")
 	p.AddReverseDependency("reversedependency", false)
 	for key, value := range p.ReverseDependencies() {
 		if key == "reversedependency" && !value {

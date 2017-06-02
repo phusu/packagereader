@@ -5,4 +5,14 @@ body {
     margin-top: 20px;
     margin-left: 20px;
     margin-right: 20px;
+    font-size: 10pt;
+}
+
+h2 {
+    font-size: 12pt;
+    font-style: italic;
+}
+
+h3 {
+    font-size: 11pt;
 }

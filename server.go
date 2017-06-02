@@ -8,7 +8,7 @@ import (
 	"packagereaderproject/packagereader"
 )
 
-var pr *packagereader.PackageReader
+var pr *packagereader.PackageInfoReader
 
 // Handles all HTML requests. Parses the URL and based on that
 // decides if it serves the index.html template or package.html template.
@@ -44,7 +44,7 @@ func main() {
 
 	// Read the packages
 	fmt.Println("Starting.")
-	pr = packagereader.NewPackageReader()
+	pr = packagereader.NewPackageInfoReader()
 	pr.ParseFile(fileName)
 	fmt.Println("File parsed.")
 

@@ -5,7 +5,7 @@ import (
 )
 
 func TestNewPackageReader(t *testing.T) {
-	pr := NewPackageReader()
+	pr := NewPackageInfoReader()
 
 	// Use existing test file
 	err := pr.ParseFile("..\\teststatus")
@@ -42,6 +42,15 @@ func TestNewPackageReader(t *testing.T) {
 	if _, ok := elem.Dependencies()["test-b"]; !ok {
 		t.Error("Missing dependency for package test-a")
 	}
+	if elem.Maintainer() != "Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>" {
+		t.Error("Wrong maintainer for package test-a: " + elem.Maintainer())
+	}
+	if elem.Architecture() != "amd64" {
+		t.Error("Wrong architecture for package test-a: " + elem.Architecture())
+	}
+	if elem.Version() != "3.3" {
+		t.Error("Wrong version for package test-a: " + elem.Version())
+	}
 
 	// Package test-b
 	elem, ok = pr.Packages()["test-b"]
@@ -72,6 +81,15 @@ func TestNewPackageReader(t *testing.T) {
 	if len(elem.Dependencies()) != 0 {
 		t.Error("test-b shouldn't have dependencies")
 	}
+	if elem.Maintainer() != "Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>" {
+		t.Error("Wrong maintainer for package test-b: " + elem.Maintainer())
+	}
+	if elem.Architecture() != "all" {
+		t.Error("Wrong architecture for package test-b: " + elem.Architecture())
+	}
+	if elem.Version() != "1.1" {
+		t.Error("Wrong version for package test-b: " + elem.Version())
+	}
 
 	// Package test-c
 	elem, ok = pr.Packages()["test-c"]
@@ -101,6 +119,15 @@ func TestNewPackageReader(t *testing.T) {
 	}
 	if _, ok := elem.Dependencies()["test-b"]; !ok {
 		t.Error("Missing dependency for package test-a")
+	}
+	if elem.Maintainer() != "Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>" {
+		t.Error("Wrong maintainer for package test-c: " + elem.Maintainer())
+	}
+	if elem.Architecture() != "amd64" {
+		t.Error("Wrong architecture for package test-c: " + elem.Architecture())
+	}
+	if elem.Version() != "2.0" {
+		t.Error("Wrong version for package test-c: " + elem.Version())
 	}
 
 	// Test for missing package

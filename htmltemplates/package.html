@@ -5,7 +5,14 @@
     </head>
     <body>
         <h1>Package: {{ .Name }}</h1>
-        <h2><em>{{ .SimpleDescription }}</em></h2>
+        <h2>"{{ .SimpleDescription }}"</h2>
+        <h3>Maintained by:</h3>
+        <p>{{ .Maintainer }}</p>
+        <h3>Version:</h3>
+        <p>{{ .Version }}</p>
+        <h3>Architecture:</h3>
+        <p>{{ .Architecture }}</p>
+        <h3>Description:</h3>
         <p>{{ range .ExtendedDescription }}{{ . }}<br>{{ end }}</p>
         <h3>Depends on:</h3>
         <ul>
