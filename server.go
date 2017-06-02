@@ -9,6 +9,7 @@ import (
 )
 
 var pr *packagereader.PackageInfoReader
+var htmltemplates = template.Must(template.ParseFiles("htmltemplates/index.html", "htmltemplates/package.html"))
 
 // Handles all HTML requests. Parses the URL and based on that
 // decides if it serves the index.html template or package.html template.
@@ -23,13 +24,17 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 			fmt.Println("Request served.")
 			return
 		}
-		t, _ := template.ParseFiles("htmltemplates/package.html")
-		t.Execute(w, elem)
+		err := htmltemplates.ExecuteTemplate(w, "package.html", elem)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 		fmt.Println("Request served.")
 		return
 	}
-	t, _ := template.ParseFiles("htmltemplates/index.html")
-	t.Execute(w, pr.Packages())
+	err := htmltemplates.ExecuteTemplate(w, "index.html", pr.Packages())
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 	fmt.Println("Request served.")
 }
 
