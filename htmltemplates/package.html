@@ -1,0 +1,25 @@
+<html>
+    <head>
+        <title>List of installed packages</title>
+        <link rel="stylesheet" href="css/styles.css">
+    </head>
+    <body>
+        <h1>Package: {{ .Name }}</h1>
+        <h2><em>{{ .SimpleDescription }}</em></h2>
+        <p>{{ range .ExtendedDescription }}{{ . }}<br>{{ end }}</p>
+        <h3>Depends on:</h3>
+        <ul>
+            {{ range $packageName, $packageExists := .Dependencies }}
+            <li>{{ if $packageExists }}<a href="{{ $packageName }}">{{ end }}{{ $packageName }}</a></li>
+            {{ end }}
+        </ul>
+        <h3>Required by:</h3>
+        <ul>
+            {{ range $packageName, $packageExists := .ReverseDependencies }}
+            <li>{{ if $packageExists }}<a href="{{ $packageName }}">{{ end }}{{ $packageName }}</a></li>
+            {{ end }}
+        </ul>
+        <br>
+        <a href="/">Back to index</a>
+    </body>
+</html>

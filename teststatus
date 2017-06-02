@@ -1,0 +1,23 @@
+Package: test-a
+Description: Description for package test-a.
+ This is a longer description for package test-a.
+ Package test-a does this and that.
+ .
+ Also test for blank line.
+Depends: test-b (>= 0.5)
+
+Package: test-b
+Description: Description for package test-b.
+ This is a longer description for package test-b.
+ Package test-b does this and that.
+ .
+ Also test for blank line.
+
+Package: test-c
+Description: Description for package test-c.
+ This is a longer description for package test-c.
+ Package test-c does this and that.
+ .
+ Also test for blank line.
+Depends: test-b
+
